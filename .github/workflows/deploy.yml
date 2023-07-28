@@ -21,6 +21,14 @@ jobs:
         with:
           fetch-depth: 0 # Required to retrieve git history
 
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install dependencies
+        run: CI=false npm install
+
       - name: Configure aws credentials
         uses: aws-actions/configure-aws-credentials@master
         with:
@@ -28,18 +36,6 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
           aws-region: "us-east-1"
 
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
-
-      - name: Install dependencies
-        run: npm ci
-
       - name: Deploy Dev
         if: github.ref == 'refs/heads/main'
         run: npm run deploy:dev
-        env:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
-          aws-region: "us-east-1"
