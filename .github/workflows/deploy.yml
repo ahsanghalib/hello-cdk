@@ -36,6 +36,6 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
           aws-region: "us-east-1"
 
-      - name: Deploy Dev
+      - name: Deploy Prod
         if: github.ref == 'refs/heads/main'
-        run: npm run deploy:dev
+        run: npm run deploy:prod
