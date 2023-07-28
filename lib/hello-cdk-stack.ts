@@ -1,7 +1,7 @@
 import * as cdk from "aws-cdk-lib";
 import { Construct } from "constructs";
 import * as apigateway from "aws-cdk-lib/aws-apigateway";
-import { Runtime } from "aws-cdk-lib/aws-lambda";
+import { Runtime, Tracing } from "aws-cdk-lib/aws-lambda";
 import * as lambda from "aws-cdk-lib/aws-lambda-nodejs";
 import * as path from "path";
 
@@ -19,6 +19,7 @@ export class HelloCdkStack extends cdk.Stack {
         metricsEnabled: true,
         loggingLevel: apigateway.MethodLoggingLevel.INFO,
         dataTraceEnabled: true,
+        tracingEnabled: true,
       },
       cloudWatchRole: true,
       defaultCorsPreflightOptions: {
@@ -38,6 +39,7 @@ export class HelloCdkStack extends cdk.Stack {
         STAGE: process.env.STAGE || "offline",
       },
       timeout: cdk.Duration.seconds(30),
+      tracing: Tracing.ACTIVE,
       bundling: {
         target: "es6",
       },
