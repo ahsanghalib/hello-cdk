@@ -8,14 +8,25 @@
     "build": "tsc",
     "watch": "tsc -w",
     "test": "jest",
-    "cdk": "cdk"
+    "cdk": "cdk",
+    "bootstrap": "cdk bootstrap --profile default --toolkit-stack-name hello-cdk-kit --qualifier hello-cdk",
+    "synth": "npm run clean && cdk synth --profile default",
+    "deploy:dev": "npm run synth && npm run bootstrap && env-cmd -f ./envs/dev cdk deploy --profile default",
+    "deploy:prod": "npm run synth && npm run bootstrap && env-cmd -f ./envs/prod cdk deploy --profile default",
+    "destroy:dev": "npm run synth && npm run bootstrap && env-cmd -f ./envs/dev cdk destroy --profile default",
+    "destroy:prod": "npm run synth && npm run bootstrap && env-cmd -f ./envs/prod cdk destroy --profile default",
+    "clean": "rm -rf cdk.out",
+    "local": "npm run synth && env-cmd -f ./envs/offline sam local start-api -t ./cdk.out/HelloCdkStack.template.json --env-vars local.env.json"
   },
   "devDependencies": {
+    "@types/aws-lambda": "^8.10.119",
     "@types/jest": "^29.5.3",
-    "@types/node": "20.4.2",
+    "@types/node": "^20.4.2",
+    "aws-cdk": "2.88.0",
+    "dotenv": "^16.3.1",
+    "env-cmd": "^10.1.0",
     "jest": "^29.6.1",
     "ts-jest": "^29.1.1",
-    "aws-cdk": "2.88.0",
     "ts-node": "^10.9.1",
     "typescript": "~5.1.6"
   },

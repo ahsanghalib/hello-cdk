@@ -1,16 +1,49 @@
-import * as cdk from 'aws-cdk-lib';
-import { Construct } from 'constructs';
-// import * as sqs from 'aws-cdk-lib/aws-sqs';
+import * as cdk from "aws-cdk-lib";
+import { Construct } from "constructs";
+import * as apigateway from "aws-cdk-lib/aws-apigateway";
+import { Runtime } from "aws-cdk-lib/aws-lambda";
+import * as lambda from "aws-cdk-lib/aws-lambda-nodejs";
+import * as path from "path";
+
+import { config } from "dotenv";
+config();
 
 export class HelloCdkStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    // The code that defines your stack goes here
+    const api = new apigateway.RestApi(this, "HelloCdkApi", {
+      restApiName: `hello-cdk-api-${process.env.STAGE || "offline"}`,
+      deployOptions: {
+        stageName: process.env.STAGE || "offlinie",
+        metricsEnabled: true,
+        loggingLevel: apigateway.MethodLoggingLevel.INFO,
+        dataTraceEnabled: true,
+      },
+      cloudWatchRole: true,
+      defaultCorsPreflightOptions: {
+        allowOrigins: apigateway.Cors.ALL_ORIGINS,
+        allowMethods: ["OPTIONS", "GET", "POST", "PUT", "PATCH", "DELETE"],
+        allowHeaders: apigateway.Cors.DEFAULT_HEADERS,
+      },
+    });
 
-    // example resource
-    // const queue = new sqs.Queue(this, 'HelloCdkQueue', {
-    //   visibilityTimeout: cdk.Duration.seconds(300)
-    // });
+    const helloFn = new lambda.NodejsFunction(this, "HelloFunction", {
+      entry: path.resolve(__dirname, "../src/functions/hello.ts"),
+      functionName: `hello-cdk-api-${process.env.STAGE || "offline"}`,
+      handler: "handler",
+      memorySize: 256,
+      runtime: Runtime.NODEJS_16_X,
+      environment: {
+        STAGE: process.env.STAGE || "offline",
+      },
+      timeout: cdk.Duration.seconds(30),
+      bundling: {
+        target: "es6",
+      },
+    });
+
+    const helloLambdaIntegration = new apigateway.LambdaIntegration(helloFn);
+    api.root.addMethod("GET", helloLambdaIntegration);
   }
 }
