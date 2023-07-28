@@ -8,8 +8,7 @@ on:
         required: true
   push:
     branches:
-      - prod
-      - develop
+      - main
 
 jobs:
   deploy:
