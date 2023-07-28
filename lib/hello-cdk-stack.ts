@@ -45,5 +45,6 @@ export class HelloCdkStack extends cdk.Stack {
 
     const helloLambdaIntegration = new apigateway.LambdaIntegration(helloFn);
     api.root.addMethod("GET", helloLambdaIntegration);
+    api.root.addResource("hello").addMethod("GET", helloLambdaIntegration);
   }
 }
